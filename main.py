@@ -5,7 +5,7 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 import google.generativeai as genai
 from dotenv import load_dotenv
-from flask_cors import CO
+from flask_cors import CORS
 import os
 
 # Load environment variables
