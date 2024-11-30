@@ -42,24 +42,33 @@ model = ChatGoogleGenerativeAI(google_api_key=API_KEY,model="gemini-1.5-flash", 
 
 # Define the prompt
 prompt_template = """
-Answer the question as precisely as possible based on the provided context. If the context contains no relevant information or if the input is a greeting like "Hi" or "Hello," respond appropriately.
+Answer the question as naturally and precisely as possible based on the provided context. If the input is a greeting or casual conversation starter, respond appropriately with a friendly tone. For unrecognized phrases or contextless questions, respond gracefully.
 
-For greetings such as "Hi" or "Hello," respond with:
-"Discussion: Hello! How can I assist you today?"
-"Image URL: Not applicable"
+Handle these scenarios:
+1. Greetings like "Hi", "Hello", or "Hey":
+   - Discussion: "Hello! How can I assist you today?"
+   - Image URL: "Not applicable"
 
-If the context contains no relevant information, respond with:
-"Discussion: Oh stree kal aana."
-"Image URL: Not applicable"
+2. Casual phrases like "How are you?" or "What's up?":
+   - Discussion: "I'm just a bot, but I'm here to help! How can I assist you today?"
+   - Image URL: "Not applicable"
+
+3. Questions like "What’s your name?" or "Who are you?":
+   - Discussion: "I'm your friendly assistant bot, here to answer your questions."
+   - Image URL: "Not applicable"
+
+4. If the context contains no relevant information or the question is unrelated to the context:
+   - Discussion: "Oh stree kal aana."
+   - Image URL: "Not applicable"
 
 Format your answer as follows:
-Discussion: <Your response based on the context or the fallback phrase>
+Discussion: <Your response>
 Image URL: <Provide an appropriate image URL or leave a placeholder if unavailable>
 
-Context: 
+Context:
 {context}
 
-Question: 
+Question:
 {question}
 
 Answer:
