@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Bot</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .chat-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-box {
+            flex-grow: 1;
+            overflow-y: scroll;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+            background-color: #fafafa;
+            margin-bottom: 10px;
+        }
+
+        .chat-message {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+
+        .user-message {
+            background-color: #f0f0f0;
+            text-align: right;
+        }
+
+        .bot-message {
+            background-color: #e0f7fa;
+        }
+
+        .user-input {
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-input input {
+            width: 80%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .user-input button {
+            width: 15%;
+            padding: 8px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .user-input button:hover {
+            background-color: #0056b3;
+        }
+
+        img {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-box" id="chat-box">
+            <!-- Bot responses will appear here -->
+        </div>
+
+        <div class="user-input">
+            <input type="text" id="user-query" placeholder="Ask me something..." />
+            <button onclick="sendQuery()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function sendQuery() {
+            const query = document.getElementById("user-query").value;
+            if (query.trim() !== "") {
+                // Append the user's message to the chat box
+                appendMessage(query, "user");
+
+                // Send the query to the API
+                fetch("http://127.0.0.1:5000/ask", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ "query": query })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Extract description and image URL from the response
+                    const description = data.description || "No description available.";
+                    const imageUrl = data["image"] || "";
+
+                    // Append bot's message to the chat box
+                    appendMessage(description, "bot");
+
+                    // If there's an image, display it
+                    if (imageUrl) {
+                        const imgElement = document.createElement("img");
+                        imgElement.src = imageUrl;
+                        imgElement.alt = "Image related to your query";
+                        document.getElementById("chat-box").appendChild(imgElement);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    appendMessage("Error fetching data from the bot. Please try again later.", "bot");
+                });
+
+                // Clear the input field
+                document.getElementById("user-query").value = "";
+            }
+        }
+
+        function appendMessage(message, sender) {
+            const chatBox = document.getElementById("chat-box");
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("chat-message");
+
+            if (sender === "user") {
+                messageDiv.classList.add("user-message");
+                messageDiv.textContent = message;
+            } else {
+                messageDiv.classList.add("bot-message");
+                messageDiv.textContent = message;
+            }
+
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+        }
+    </script>
+
+</body>
+</html>
